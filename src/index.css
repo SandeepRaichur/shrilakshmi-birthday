@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-cream: #FAF6EF;
+    --text-primary: #2D3139;
+    --accent-purple: #9333EA;
+    --accent-pink: #EC4899;
+    --accent-amber: #F59E0B;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #FAF6EF;
+    color: #2D3139;
+    font-family: 'Plus Jakarta Sans', 'Nunito', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(at 10% 10%, rgba(252, 231, 243, 0.45) 0px, transparent 50%),
+      radial-gradient(at 90% 15%, rgba(243, 232, 255, 0.45) 0px, transparent 50%),
+      radial-gradient(at 85% 85%, rgba(254, 243, 199, 0.35) 0px, transparent 50%),
+      radial-gradient(at 15% 80%, rgba(220, 252, 231, 0.35) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #FAF6EF;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #D8B4FE;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C084FC;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+  }
+
+  .font-display {
+    font-family: 'Fraunces', 'Outfit', serif;
+    font-optical-sizing: auto;
+  }
+
+  .font-handwriting {
+    font-family: 'Caveat', 'Patrick Hand', cursive;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 
+      0 12px 32px -4px rgba(168, 85, 247, 0.08),
+      0 4px 12px -2px rgba(244, 114, 182, 0.05),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+  }
+
+  .glass-card-subtle {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(243, 232, 255, 0.7);
+  }
+
+  /* Aesthetic Polaroid & Memo styling */
+  .polaroid-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    box-shadow: 
+      0 16px 36px -8px rgba(75, 45, 120, 0.09),
+      0 6px 14px -3px rgba(0, 0, 0, 0.04),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+  }
+
+  /* Washi tape decorative elements */
+  .washi-tape-amber {
+    background: rgba(254, 240, 138, 0.75);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border-left: 2px dashed rgba(245, 158, 11, 0.3);
+    border-right: 2px dashed rgba(245, 158, 11, 0.3);
+  }
+
+  .washi-tape-pink {
+    background: rgba(251, 207, 232, 0.75);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border-left: 2px dashed rgba(236, 72, 153, 0.3);
+    border-right: 2px dashed rgba(236, 72, 153, 0.3);
+  }
+
+  .washi-tape-purple {
+    background: rgba(233, 213, 255, 0.75);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border-left: 2px dashed rgba(168, 85, 247, 0.3);
+    border-right: 2px dashed rgba(168, 85, 247, 0.3);
+  }
+
+  /* Editorial pill badge */
+  .editorial-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3125rem 0.875rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+/* Sparkle & floating animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s infinite;
+}
+
+/* Prevent unwanted mobile text selection on quick taps */
+button, .no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
