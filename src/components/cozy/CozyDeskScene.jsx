@@ -472,7 +472,7 @@ export default function CozyDeskScene({
                       {stations.personalMessage?.title || "Starlight Letter · Ondu Chikka Kagadha"}
                     </h4>
                     <p className="text-xs text-stone-600 mt-1 font-sans">
-                      {stations.personalMessage?.desc || "Quiet thoughts, genuine appreciation & Sandyy's signature."}
+                      {stations.personalMessage?.desc || "Quiet thoughts, genuine appreciation & Sandeep's signature."}
                     </p>
                   </div>
                   <div className="mt-3 pt-2 border-t border-indigo-200/60 flex items-center justify-between text-[10px] font-mono text-indigo-800">

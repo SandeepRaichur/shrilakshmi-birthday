@@ -1,173 +1,325 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image as ImageIcon, Sparkles, X, Heart } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { shrilakshmiContent } from '../data/shrilakshmi';
-import { playPop, playPaperFlip } from '../utils/audioEffects';
+import { playPaperFlip, playPop } from '../utils/audioEffects';
 
 export default function PhotosSection() {
-  const { photos, photoSettings } = shrilakshmiContent;
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [brokenImages, setBrokenImages] = useState({});
+  const { gallery } = shrilakshmiContent;
+  const collections = gallery?.collections || [];
 
-  const enabledPhotos = (photos || []).filter((p) => p.enabled !== false);
+  // Flatten all images across collections for global lightbox navigation
+  const allImages = collections.flatMap((c) =>
+    (c.images || []).map((img) => ({
+      ...img,
+      collectionTitle: c.title,
+      collectionLabel: c.label,
+    }))
+  );
 
-  if (enabledPhotos.length === 0) return null;
+  const [activeImageIndex, setActiveImageIndex] = useState(null);
 
-  const handleImageError = (id) => {
-    setBrokenImages((prev) => ({ ...prev, [id]: true }));
+  const handleOpenLightbox = (globalIndex) => {
+    playPaperFlip();
+    setActiveImageIndex(globalIndex);
   };
 
+  const handleCloseLightbox = () => {
+    playPop();
+    setActiveImageIndex(null);
+  };
+
+  const handleNext = (e) => {
+    e?.stopPropagation();
+    if (activeImageIndex === null) return;
+    playPaperFlip();
+    setActiveImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const handlePrev = (e) => {
+    e?.stopPropagation();
+    if (activeImageIndex === null) return;
+    playPaperFlip();
+    setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (activeImageIndex === null) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') handleNext();
+      else if (e.key === 'ArrowLeft') handlePrev();
+      else if (e.key === 'Escape') handleCloseLightbox();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeImageIndex, allImages.length]);
+
+  const currentPhoto = activeImageIndex !== null ? allImages[activeImageIndex] : null;
+
   return (
-    <section id="photos" className="relative w-full max-w-5xl mx-auto px-4 py-20 flex flex-col items-center select-none">
-      {/* Section Header */}
-      <div className="text-center mb-12">
-        <span className="editorial-pill bg-purple-100/90 text-purple-900 border border-purple-200/80 mb-3 shadow-2xs">
-          📷 MEMORY VAULT · PHOTOS
-        </span>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-stone-900 font-serif tracking-tight">
-          {photoSettings?.title || "The Polaroid Gallery · Photos"}
+    <section id="gallery" className="w-full max-w-6xl mx-auto px-6 sm:px-12 py-20 sm:py-28 select-none border-b border-paper-border">
+      
+      {/* -----------------------------------------------------------------------
+          EDITORIAL HEADER
+          ----------------------------------------------------------------------- */}
+      <div className="pb-12 border-b border-paper-border space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="editorial-label text-muted-text">
+            {gallery.curatedTag || "PHOTO GALLERY"}
+          </span>
+          <span className="text-[11px] font-mono text-olive font-semibold tracking-wider uppercase">
+            {allImages.length} PHOTOS
+          </span>
+        </div>
+
+        <h2 className="text-4xl sm:text-6xl md:text-7xl font-display font-bold text-ink tracking-tight leading-[0.95]">
+          {gallery.title || "SHRILAKSHMI'S PHOTOS"}
         </h2>
-        <p className="text-stone-500 font-sans text-sm sm:text-base mt-2 max-w-md mx-auto leading-relaxed">
-          {photoSettings?.subtitle || "Real captures, genuine moments, zero curated pretension."}
+
+        <p className="text-base sm:text-lg text-muted-text font-sans max-w-2xl leading-relaxed">
+          {gallery.subtitle || "Some good memories and photos from college days."}
         </p>
       </div>
 
-      {/* Grid of Polaroid Cards */}
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch">
-        {enabledPhotos.map((photo, index) => {
-          const isBroken = brokenImages[photo.id];
-          const tilts = [-2, 1.5, -1, 2.5, -1.8, 2];
-          const tilt = tilts[index % tilts.length];
-
+      {/* -----------------------------------------------------------------------
+          THE 3 CURATED COLLECTIONS (PERFECTLY ALIGNED GRIDS)
+          ----------------------------------------------------------------------- */}
+      <div className="space-y-24 pt-16">
+        {collections.map((col) => {
           return (
-            <motion.div
-              key={photo.id}
-              whileHover={{ y: -6, rotate: 0, scale: 1.02 }}
-              style={{ rotate: tilt }}
-              onClick={() => {
-                playPaperFlip();
-                setSelectedPhoto(photo);
-              }}
-              className="cursor-pointer relative p-4 rounded-3xl bg-white border border-stone-200/80 shadow-polaroid hover:shadow-hover transition-all flex flex-col justify-between group overflow-hidden"
-            >
-              {/* Cute Washi Tape on top */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 washi-tape-pink rounded-xs pointer-events-none z-10" />
-
-              {/* Photo Image Area */}
-              <div className="relative w-full aspect-square rounded-2xl bg-gradient-to-tr from-pink-50 via-purple-50 to-amber-50 border border-stone-200/60 overflow-hidden flex items-center justify-center">
-                {!isBroken && photo.src ? (
-                  <img
-                    src={photo.src}
-                    alt={photo.alt || photo.title || "Shrilakshmi memory photo"}
-                    onError={() => handleImageError(photo.id)}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  /* Graceful Pastel Placeholder when photo file hasn't been placed in public/photos/ yet */
-                  <div className="w-full h-full p-4 flex flex-col items-center justify-center text-center bg-gradient-to-br from-purple-50 to-pink-50 text-stone-600">
-                    <span className="text-3xl mb-1 filter drop-shadow-xs">🌷</span>
-                    <span className="text-xs font-serif font-bold text-purple-900 mt-1">
-                      {photo.title || `Memory #${index + 1}`}
+            <div key={col.id} className="space-y-8">
+              
+              {/* Collection Header Strip */}
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-paper-border pb-4 gap-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-olive uppercase tracking-wider">
+                      {col.collectionNumber}
                     </span>
-                    <span className="text-[10px] font-mono text-purple-600/70 mt-1 px-2 py-0.5 rounded-full bg-purple-100/60">
-                      {photo.src || 'public/photos/image.jpg'}
+                    <span className="text-paper-border">•</span>
+                    <span className="text-[10px] font-mono text-muted-text uppercase tracking-widest px-2.5 py-0.5 bg-paper-light border border-paper-border rounded-xs">
+                      {col.label}
                     </span>
                   </div>
-                )}
+                  <h3 className="text-2xl sm:text-4xl font-display font-semibold text-ink leading-tight">
+                    {col.title}
+                  </h3>
+                  <p className="text-sm font-sans text-muted-text">
+                    {col.subtitle}
+                  </p>
+                </div>
+
+                <span className="text-xs font-mono text-muted-text">
+                  {col.images?.length} FRAMES
+                </span>
               </div>
 
-              {/* Caption Area */}
-              <div className="mt-3 text-center px-1">
-                <h4 className="font-serif font-bold text-stone-900 text-sm">
-                  {photo.title || `Moment #${index + 1}`}
-                </h4>
-                {photoSettings?.showCaptions !== false && photo.caption && (
-                  <p className="text-xs text-stone-600 font-sans mt-0.5">
-                    {photo.caption}
-                  </p>
-                )}
-                {photo.kannadaCaption && (
-                  <p className="text-xs font-handwriting text-purple-700 font-bold mt-1">
-                    {photo.kannadaCaption}
-                  </p>
-                )}
-              </div>
-            </motion.div>
+              {/* COLLECTION 01: THE EARLY YEARS (4 Photos Uniform 4-Col Grid) */}
+              {col.id === 'childhood' && (
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  {col.images.map((img) => {
+                    const globalIdx = allImages.findIndex((item) => item.id === img.id);
+                    return (
+                      <div
+                        key={img.id}
+                        onClick={() => handleOpenLightbox(globalIdx)}
+                        className="group bg-paper-light p-3 border border-paper-border hover:border-ink/60 rounded-xs shadow-2xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                      >
+                        {/* Uniform Aspect Ratio */}
+                        <div className="relative aspect-4/5 w-full overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
+                          <img
+                            src={img.src}
+                            alt={img.alt}
+                            className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <span className="p-2 bg-paper text-ink rounded-full shadow-xs">
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Perfectly Aligned Bottom Strip */}
+                        <div className="mt-3 pt-2.5 border-t border-paper-border/60 flex items-center justify-between text-xs font-mono text-muted-text">
+                          <span className="font-medium text-ink">FRAME #{img.number}</span>
+                          <span className="text-[10px] text-olive font-bold uppercase tracking-wider">ARCHIVAL</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* COLLECTION 02: THE SHRILAKSHMI FILES (16 Photos Uniform Aligned Grid) */}
+              {col.id === 'individual' && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                  {col.images.map((img) => {
+                    const globalIdx = allImages.findIndex((item) => item.id === img.id);
+
+                    return (
+                      <div
+                        key={img.id}
+                        onClick={() => handleOpenLightbox(globalIdx)}
+                        className="group bg-paper-light p-3 border border-paper-border hover:border-ink/60 rounded-xs shadow-2xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                      >
+                        {/* Uniform Aspect Ratio: Perfectly Aligned Everywhere */}
+                        <div className="relative aspect-4/5 w-full overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
+                          <img
+                            src={img.src}
+                            alt={img.alt}
+                            className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <span className="p-2 bg-paper text-ink rounded-full shadow-xs">
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Perfectly Aligned Bottom Strip */}
+                        <div className="mt-3 pt-2.5 border-t border-paper-border/60 flex items-center justify-between text-xs font-mono">
+                          <span className="text-muted-text text-[11px] truncate pr-2">
+                            Frame #{img.number}
+                          </span>
+                          <span className="font-semibold text-ink text-[11px] shrink-0">
+                            VIEW
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* COLLECTION 03: THE SHARED FRAMES (2 Photos Centered Side-by-Side Grid) */}
+              {col.id === 'together' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto pt-2">
+                  {col.images.map((img) => {
+                    const globalIdx = allImages.findIndex((item) => item.id === img.id);
+                    return (
+                      <div
+                        key={img.id}
+                        onClick={() => handleOpenLightbox(globalIdx)}
+                        className="group bg-paper-light p-4 border border-paper-border hover:border-ink/70 rounded-xs shadow-xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                      >
+                        <div className="relative aspect-4/5 w-full overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
+                          <img
+                            src={img.src}
+                            alt={img.alt}
+                            className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <span className="p-2.5 bg-paper text-ink rounded-full shadow-xs">
+                              <Maximize2 className="w-4 h-4" />
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-3.5 pt-3 border-t border-paper-border/70 flex items-center justify-between text-xs font-mono">
+                          <span className="text-ink font-medium">{img.caption}</span>
+                          <span className="text-olive font-bold tracking-wider">FRAME #{img.number}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+            </div>
           );
         })}
       </div>
 
-      {/* Enlarged Photo Modal */}
+      {/* -----------------------------------------------------------------------
+          MODAL LIGHTBOX
+          ----------------------------------------------------------------------- */}
       <AnimatePresence>
-        {selectedPhoto && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md select-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-lg p-6 rounded-3xl bg-white border border-stone-200 shadow-2xl text-stone-900 flex flex-col items-center"
+        {activeImageIndex !== null && currentPhoto && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={handleCloseLightbox}
+            className="fixed inset-0 z-50 bg-ink/90 backdrop-blur-md flex flex-col justify-between p-4 sm:p-8"
+          >
+            {/* Top Toolbar */}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full flex items-center justify-between text-paper text-xs font-mono"
             >
-              {/* Close Button */}
-              <button
-                onClick={() => {
-                  playPop();
-                  setSelectedPhoto(null);
-                }}
-                className="absolute top-4 right-4 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              {/* Photo Frame */}
-              <div className="w-full aspect-square rounded-2xl overflow-hidden bg-stone-100 border border-stone-200 flex items-center justify-center my-3">
-                {!brokenImages[selectedPhoto.id] && selectedPhoto.src ? (
-                  <img
-                    src={selectedPhoto.src}
-                    alt={selectedPhoto.alt || selectedPhoto.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-center p-6">
-                    <span className="text-5xl">🌷</span>
-                    <p className="text-sm font-serif font-bold text-purple-900 mt-2">
-                      {selectedPhoto.title}
-                    </p>
-                    <p className="text-xs font-mono text-stone-500 mt-1">
-                      Place image in {selectedPhoto.src}
-                    </p>
-                  </div>
-                )}
+              <div className="flex items-center gap-3">
+                <span className="px-2.5 py-0.5 bg-paper/20 rounded text-[10px] uppercase tracking-wider">
+                  {currentPhoto.collectionLabel || "ARCHIVE"}
+                </span>
+                <span className="text-paper/80 hidden sm:inline">
+                  Frame #{currentPhoto.number} · {currentPhoto.caption}
+                </span>
               </div>
 
-              {/* Details */}
-              <h3 className="font-serif font-bold text-xl text-stone-900 mt-1">
-                {selectedPhoto.title}
-              </h3>
-              {selectedPhoto.caption && (
-                <p className="text-sm text-stone-600 font-sans mt-1 text-center">
-                  {selectedPhoto.caption}
-                </p>
-              )}
-              {selectedPhoto.kannadaCaption && (
-                <p className="text-base font-handwriting text-purple-700 font-bold mt-1 text-center">
-                  {selectedPhoto.kannadaCaption}
-                </p>
-              )}
+              <div className="flex items-center gap-4">
+                <span className="font-mono">
+                  {activeImageIndex + 1} / {allImages.length}
+                </span>
+                <button
+                  onClick={handleCloseLightbox}
+                  className="p-1.5 rounded-full bg-paper/10 hover:bg-paper/30 text-paper transition-colors cursor-pointer"
+                  title="Close (Esc)"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Center Image Container */}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative my-auto flex items-center justify-center w-full max-h-[82vh]"
+            >
+              <button
+                onClick={handlePrev}
+                className="absolute left-2 sm:left-4 z-10 p-2 sm:p-3 rounded-full bg-paper/20 hover:bg-paper/40 text-paper transition-all cursor-pointer backdrop-blur-xs"
+                title="Previous (Left arrow)"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              <img
+                src={currentPhoto.src}
+                alt={currentPhoto.alt}
+                className="max-h-[78vh] max-w-[88vw] object-contain rounded-xs shadow-2xl border border-paper/20"
+              />
 
               <button
-                onClick={() => {
-                  playPop();
-                  setSelectedPhoto(null);
-                }}
-                className="mt-5 px-6 py-2 rounded-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-xs"
+                onClick={handleNext}
+                className="absolute right-2 sm:right-4 z-10 p-2 sm:p-3 rounded-full bg-paper/20 hover:bg-paper/40 text-paper transition-all cursor-pointer backdrop-blur-xs"
+                title="Next (Right arrow)"
               >
-                Close · Saaku ✨
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
-            </motion.div>
-          </div>
+            </div>
+
+            {/* Bottom Info Strip */}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full text-center text-paper/80 text-xs font-mono space-y-1"
+            >
+              <p className="font-sans text-sm sm:text-base text-paper font-medium">
+                Frame #{currentPhoto.number} — {currentPhoto.caption}
+              </p>
+              <span className="text-[10px] text-paper/50 block">
+                PRESS ESC TO EXIT · USE ARROW KEYS TO NAVIGATE
+              </span>
+            </div>
+
+          </motion.div>
         )}
       </AnimatePresence>
+
     </section>
   );
 }

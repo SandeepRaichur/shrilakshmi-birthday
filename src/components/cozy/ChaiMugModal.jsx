@@ -23,9 +23,9 @@ const CHAI_THOUGHTS = [
     mood: "🪔"
   },
   {
-    quote: "“Nanna hesaru Sandyy... and I spent hours making sure this website makes you smile. Boring anali antha alla! 😂”",
+    quote: "“Nanna hesaru Sandeep... and I spent hours making sure this website makes you smile. Boring anali antha alla! 😂”",
     sub: "Directly from the developer's heart.",
-    tag: "DEV NOTE · SANDYY",
+    tag: "DEV NOTE · SANDEEP",
     mood: "💻"
   },
   {

@@ -1,4 +1,4 @@
-// Utility to generate and download a clean, high-resolution (2x) PNG for Shrilakshmi's memes
+// Utility to generate and download a clean, high-resolution (2x) editorial PNG for Shrilakshmi's memes
 
 export async function exportMemeCardAsPng({
   id,
@@ -10,6 +10,7 @@ export async function exportMemeCardAsPng({
   panel2Text,
   punchline,
   caption,
+  annotation,
 }) {
   try {
     if (document.fonts) {
@@ -24,18 +25,10 @@ export async function exportMemeCardAsPng({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Helper: draw rounded rect
-    const drawRoundedRect = (x, y, w, h, r, fill, stroke) => {
+    // Helper: draw rect
+    const drawRect = (x, y, w, h, fill, stroke) => {
       ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.rect(x, y, w, h);
       ctx.closePath();
       if (fill) {
         ctx.fillStyle = fill;
@@ -43,7 +36,7 @@ export async function exportMemeCardAsPng({
       }
       if (stroke) {
         ctx.strokeStyle = stroke;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1;
         ctx.stroke();
       }
     };
@@ -52,7 +45,7 @@ export async function exportMemeCardAsPng({
     const wrapText = (text, x, y, maxWidth, lineHeight, font, fill) => {
       ctx.font = font;
       ctx.fillStyle = fill;
-      const words = text.split(' ');
+      const words = (text || '').split(' ');
       let line = '';
       let currentY = y;
 
@@ -71,128 +64,108 @@ export async function exportMemeCardAsPng({
       return currentY + lineHeight;
     };
 
-    // 1. Base cream background
-    ctx.fillStyle = '#FAF7F0';
+    // 1. Base Warm Paper Background
+    ctx.fillStyle = '#F5F1E8';
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Subtle outer border card
-    drawRoundedRect(40, 40, width - 80, height - 80, 36, '#FFFFFF', '#E9D5FF');
+    // 2. Editorial Outer Border Card
+    drawRect(50, 50, width - 100, height - 100, '#F5F1E8', '#DAD5C9');
+    drawRect(60, 60, width - 120, height - 120, null, '#E5E0D5');
 
-    // 2b. Cute Washi Tape at Top of Card
-    drawRoundedRect(width / 2 - 80, 24, 160, 32, 4, 'rgba(254, 240, 138, 0.9)', 'rgba(245, 158, 11, 0.3)');
-    ctx.font = 'bold 11px monospace';
-    ctx.fillStyle = '#92400E';
-    ctx.textAlign = 'center';
-    ctx.fillText('FIELD NOTE · ARCHIVED', width / 2, 44);
-
-    // 3. Top Tag
-    drawRoundedRect(80, 80, 260, 38, 19, '#F3E8FF', '#DDD6FE');
-    ctx.font = '700 13px "Outfit", Nunito, sans-serif';
-    ctx.fillStyle = '#6B21A8';
-    ctx.textAlign = 'center';
-    ctx.fillText('A LITTLE ABOUT SHRILAKSHMI', 210, 104);
-
-    // Title & Subtitle in Fraunces serif
+    // 3. Top Restrained Editorial Masthead
+    ctx.font = '600 12px monospace';
+    ctx.fillStyle = '#77766D';
     ctx.textAlign = 'left';
-    ctx.font = 'bold 36px "Fraunces", "Outfit", serif';
-    ctx.fillStyle = '#1F2937';
-    ctx.fillText(title, 80, 165);
+    ctx.fillText('A SMALL INTERNET EXPERIMENT · TWO VERY SPECIFIC OBSERVATIONS', 90, 105);
 
-    ctx.font = '400 17px "Plus Jakarta Sans", Nunito, sans-serif';
-    ctx.fillStyle = '#6B7280';
-    ctx.fillText(subtitle, 80, 198);
-
-    // Horizontal divider
-    ctx.strokeStyle = '#F3F4F6';
-    ctx.beginPath();
-    ctx.moveTo(80, 225);
-    ctx.lineTo(width - 80, 225);
-    ctx.stroke();
-
-    // 4. Panel 1 Box
-    drawRoundedRect(80, 255, width - 160, 150, 24, '#FDFBF7', '#E5E7EB');
-    // Pill inside Panel 1
-    ctx.font = 'bold 15px "Outfit", Nunito, sans-serif';
-    const pill1Width = Math.max(190, ctx.measureText(panel1Title).width + 36);
-    drawRoundedRect(110, 280, pill1Width, 32, 16, '#FEF3C7', '#FDE68A');
-    ctx.fillStyle = '#92400E';
-    ctx.fillText(panel1Title, 128, 302);
-
-    ctx.font = 'italic 20px "Caveat", "Patrick Hand", Nunito, sans-serif';
-    ctx.fillStyle = '#374151';
-    wrapText(panel1Text, 110, 355, width - 220, 28, 'italic 21px Nunito, sans-serif', '#374151');
-
-    // 5. Panel 2 Box
-    drawRoundedRect(80, 435, width - 160, 150, 24, '#FDFBF7', '#E5E7EB');
-    // Pill inside Panel 2
-    ctx.font = 'bold 15px "Outfit", Nunito, sans-serif';
-    const pill2Width = Math.max(190, ctx.measureText(panel2Title).width + 36);
-    drawRoundedRect(110, 460, pill2Width, 32, 16, '#EDE9FE', '#DDD6FE');
-    ctx.fillStyle = '#5B21B6';
-    ctx.fillText(panel2Title, 128, 482);
-
-    ctx.font = 'italic 20px "Caveat", "Patrick Hand", Nunito, sans-serif';
-    ctx.fillStyle = '#374151';
-    wrapText(panel2Text, 110, 535, width - 220, 28, 'italic 21px Nunito, sans-serif', '#374151');
-
-    // 6. Punchline Revealed Box
-    drawRoundedRect(80, 620, width - 160, 240, 24, '#FAF5FF', '#D8B4FE');
-
-    ctx.font = '600 13px "Outfit", Nunito, sans-serif';
-    ctx.fillStyle = '#7E22CE';
-    ctx.fillText('THE REVEAL', 110, 660);
-
-    // Punchline text in Fraunces serif
-    wrapText(
-      punchline,
-      110,
-      715,
-      width - 220,
-      40,
-      'bold 28px "Fraunces", "Outfit", serif',
-      '#1E1B4B'
-    );
-
-    // Caption
-    wrapText(
-      caption,
-      110,
-      810,
-      width - 220,
-      28,
-      'italic 18px Nunito, sans-serif',
-      '#6B7280'
-    );
-
-    // 7. Footer
-    ctx.strokeStyle = '#F3F4F6';
-    ctx.beginPath();
-    ctx.moveTo(80, 990);
-    ctx.lineTo(width - 80, 990);
-    ctx.stroke();
-
-    ctx.font = 'bold 20px "Patrick Hand", "Caveat", cursive';
-    ctx.fillStyle = '#581C87';
-    ctx.fillText('— Sandyy', 80, 1035);
-
-    ctx.font = '500 14px Nunito, sans-serif';
-    ctx.fillStyle = '#9CA3AF';
     ctx.textAlign = 'right';
-    ctx.fillText('for Shrilakshmi · 2026', width - 80, 1035);
+    ctx.fillText('MADE FOR SHRILAKSHMI · 2026', width - 90, 105);
 
-    // Convert to blob and download
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `shrilakshmi-${id}-meme.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }, 'image/png');
+    // Divider line
+    ctx.beginPath();
+    ctx.moveTo(90, 125);
+    ctx.lineTo(width - 90, 125);
+    ctx.strokeStyle = '#DAD5C9';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 4. Large Editorial Headline
+    ctx.textAlign = 'left';
+    ctx.font = 'normal 44px "Instrument Serif", "DM Serif Display", Georgia, serif';
+    ctx.fillStyle = '#22231F';
+    ctx.fillText(title, 90, 195);
+
+    // Subtitle
+    ctx.font = '16px "Inter", sans-serif';
+    ctx.fillStyle = '#77766D';
+    ctx.fillText(subtitle || 'Purely coincidental. Probably.', 90, 235);
+
+    // 5. Side-by-side comparison panels
+    const panelY = 275;
+    const panelWidth = 385;
+    const panelHeight = 220;
+
+    // Panel 1
+    drawRect(90, panelY, panelWidth, panelHeight, '#FFFFFF', '#DAD5C9');
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#777D5A';
+    ctx.fillText((panel1Title || '2025').toUpperCase(), 115, panelY + 38);
+
+    wrapText(panel1Text, 115, panelY + 80, panelWidth - 50, 26, 'normal 18px "Inter", sans-serif', '#22231F');
+
+    // Panel 2
+    drawRect(width - 90 - panelWidth, panelY, panelWidth, panelHeight, '#FFFFFF', '#DAD5C9');
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#777D5A';
+    ctx.fillText((panel2Title || '2026').toUpperCase(), width - 90 - panelWidth + 25, panelY + 38);
+
+    wrapText(panel2Text, width - 90 - panelWidth + 25, panelY + 80, panelWidth - 50, 26, 'normal 18px "Inter", sans-serif', '#22231F');
+
+    // 6. Punchline Box (Editorial chartreuse/olive accent)
+    const punchY = 540;
+    drawRect(90, punchY, width - 180, 280, '#FAF8F3', '#DAD5C9');
+
+    ctx.font = 'bold 11px monospace';
+    ctx.fillStyle = '#777D5A';
+    ctx.fillText('VERIFIED HYPOTHESIS', 120, punchY + 45);
+
+    // Big italic serif quote
+    wrapText(punchline, 120, punchY + 110, width - 240, 48, 'italic 34px "Instrument Serif", "DM Serif Display", Georgia, serif', '#22231F');
+
+    // Annotation
+    if (annotation) {
+      ctx.font = '600 12px monospace';
+      ctx.fillStyle = '#777D5A';
+      ctx.fillText(`[ ${annotation} ]`, 120, punchY + 235);
+    }
+
+    // 7. Supporting Caption & Footer
+    ctx.textAlign = 'left';
+    ctx.font = '14px "Inter", sans-serif';
+    ctx.fillStyle = '#77766D';
+    ctx.fillText(caption || '', 90, height - 130);
+
+    // Bottom colophon
+    ctx.beginPath();
+    ctx.moveTo(90, height - 100);
+    ctx.lineTo(width - 90, height - 100);
+    ctx.strokeStyle = '#DAD5C9';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#77766D';
+    ctx.fillText('EDITORIAL OBSERVATION · CONFIDENTIAL FRIENDSHIP ARCHIVE', 90, height - 75);
+
+    ctx.textAlign = 'right';
+    ctx.fillText('— Sandeep · 2026', width - 90, height - 75);
+
+    // Download trigger
+    const link = document.createElement('a');
+    link.download = `shrilakshmi-${id}-observation.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   } catch (err) {
-    console.error('Failed to export meme as PNG:', err);
+    console.error('Failed to export meme PNG:', err);
   }
 }

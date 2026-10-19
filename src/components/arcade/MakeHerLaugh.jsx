@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Laugh, Sparkles, RefreshCw } from 'lucide-react';
+import { RefreshCw, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { playPop, playChime, playSuccess, playBoing } from '../../utils/audioEffects';
 import { shrilakshmiContent } from '../../data/shrilakshmi';
 
-export default function MakeHerLaugh({ onComplete }) {
+export default function MakeHerLaugh({ onDiscoveryUnlocked }) {
   const laughConfig = shrilakshmiContent.games?.makeHerLaugh || {};
   const jokesData = laughConfig.jokes || {
     joke: ["Why do we tell actors to break a leg? Because every play has a cast."],
@@ -50,13 +50,13 @@ export default function MakeHerLaugh({ onComplete }) {
         setIsSuccess(true);
         playSuccess();
         confetti({
-          particleCount: 55,
-          spread: 75,
+          particleCount: 45,
+          spread: 65,
           origin: { y: 0.6 },
-          colors: ['#FBBF24', '#F472B6', '#34D399'],
+          colors: ['#777D5A', '#D8F36A', '#C9A6A0', '#22231F'],
         });
-        if (onComplete) onComplete();
-      }, 500);
+        if (onDiscoveryUnlocked) onDiscoveryUnlocked('arcade_laugh');
+      }, 400);
     } else {
       playChime(440 + nextLevel * 4);
     }
@@ -73,45 +73,41 @@ export default function MakeHerLaugh({ onComplete }) {
   const expression = getExpression();
 
   return (
-    <div className="w-full max-w-xl mx-auto p-6 sm:p-8 rounded-[2.5rem] bg-white/95 backdrop-blur-xl border border-white/90 shadow-glass">
+    <div className="w-full max-w-xl mx-auto p-6 sm:p-8 rounded-sm bg-paper border border-paper-border text-ink">
+      
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-stone-100 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2.5 rounded-2xl bg-pink-100 text-pink-700 shadow-2xs">
-            <Laugh className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-bold text-stone-900 text-xl font-serif tracking-tight">
-              {laughConfig.title || "Make Her Laugh"}
-            </h3>
-            <p className="text-xs text-stone-500 font-sans">
-              Test your comedy arsenal against the stoic avatar
-            </p>
-          </div>
+      <div className="flex items-center justify-between pb-4 border-b border-paper-border mb-6">
+        <div>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-olive font-semibold">
+            ACTIVITY #03 · COMEDIC ENDURANCE TEST
+          </span>
+          <h4 className="text-xl sm:text-2xl font-serif text-ink mt-0.5">
+            {laughConfig.title || "Make Her Laugh"}
+          </h4>
         </div>
 
-        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-pink-50 text-pink-800 border border-pink-200/80 font-mono">
-          Meter: {laughterLevel}%
+        <span className="text-xs font-mono text-muted-text border border-paper-border px-2.5 py-1 rounded-sm">
+          METER: {laughterLevel}%
         </span>
       </div>
 
-      {/* Laughter Meter Bar */}
-      <div className="w-full h-2 rounded-full bg-stone-100 overflow-hidden mb-6">
+      {/* Hairline Progress Rule */}
+      <div className="w-full h-1 bg-paper-border rounded-full overflow-hidden mb-6">
         <motion.div
           animate={{ width: `${laughterLevel}%` }}
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          className="h-full bg-gradient-to-r from-amber-300 via-pink-400 to-rose-500 rounded-full"
+          className="h-full bg-olive rounded-full"
         />
       </div>
 
-      {/* Cute Expressive Cartoon Avatar */}
+      {/* Expressive Editorial Avatar */}
       <div className="flex flex-col items-center justify-center mb-6">
         <motion.div
           animate={
             expression === 'crying_laugh'
-              ? { y: [0, -12, 0], rotate: [-4, 4, -4] }
+              ? { y: [0, -10, 0], rotate: [-3, 3, -3] }
               : expression === 'giggle'
-              ? { y: [0, -6, 0] }
+              ? { y: [0, -5, 0] }
               : { y: [0, -2, 0] }
           }
           transition={{
@@ -119,101 +115,81 @@ export default function MakeHerLaugh({ onComplete }) {
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="relative w-36 h-36 flex items-center justify-center select-none"
+          className="relative w-32 h-32 flex items-center justify-center select-none"
         >
-          {/* Avatar Face Container SVG */}
-          <svg viewBox="0 0 100 100" className="w-full h-full filter drop-shadow-md">
-            {/* Soft background glow */}
-            <circle cx="50" cy="50" r="46" fill="#FCE7F3" opacity="0.5" />
-
-            {/* Hair back */}
-            <circle cx="50" cy="46" r="38" fill="#4B5563" />
-
-            {/* Face base */}
-            <circle cx="50" cy="52" r="32" fill="#FED7AA" />
-
-            {/* Bangs / Hair front */}
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="46" fill="#FAF8F3" stroke="#DAD5C9" strokeWidth="1" />
+            <circle cx="50" cy="46" r="38" fill="#77766D" />
+            <circle cx="50" cy="52" r="32" fill="#F5F1E8" stroke="#DAD5C9" strokeWidth="1" />
+            
+            {/* Bangs */}
             <path
               d="M 22 44 Q 35 28 50 32 Q 65 28 78 44 Q 68 36 50 38 Q 32 36 22 44 Z"
-              fill="#374151"
+              fill="#22231F"
             />
 
             {/* Blush cheeks */}
-            <circle
-              cx="32"
-              cy="58"
-              r={expression === 'crying_laugh' ? 6 : 4}
-              fill="#F472B6"
-              opacity="0.6"
-            />
-            <circle
-              cx="68"
-              cy="58"
-              r={expression === 'crying_laugh' ? 6 : 4}
-              fill="#F472B6"
-              opacity="0.6"
-            />
+            <circle cx="32" cy="58" r={expression === 'crying_laugh' ? 5 : 3.5} fill="#C9A6A0" opacity="0.6" />
+            <circle cx="68" cy="58" r={expression === 'crying_laugh' ? 5 : 3.5} fill="#C9A6A0" opacity="0.6" />
 
-            {/* Dynamic Eyes based on expression */}
+            {/* Dynamic Eyes */}
             {expression === 'neutral' && (
               <>
-                <circle cx="38" cy="50" r="3" fill="#1F2937" />
-                <circle cx="62" cy="50" r="3" fill="#1F2937" />
+                <circle cx="38" cy="50" r="3" fill="#22231F" />
+                <circle cx="62" cy="50" r="3" fill="#22231F" />
               </>
             )}
 
             {expression === 'smirk' && (
               <>
-                <circle cx="38" cy="49" r="3" fill="#1F2937" />
-                <path d="M 60 51 Q 63 48 66 51" stroke="#1F2937" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                <circle cx="38" cy="49" r="3" fill="#22231F" />
+                <path d="M 60 51 Q 63 48 66 51" stroke="#22231F" strokeWidth="2" strokeLinecap="round" fill="none" />
               </>
             )}
 
             {(expression === 'chuckle' || expression === 'giggle') && (
               <>
-                <path d="M 34 51 Q 38 46 42 51" stroke="#1F2937" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                <path d="M 58 51 Q 62 46 66 51" stroke="#1F2937" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                <path d="M 34 51 Q 38 46 42 51" stroke="#22231F" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <path d="M 58 51 Q 62 46 66 51" stroke="#22231F" strokeWidth="2" strokeLinecap="round" fill="none" />
               </>
             )}
 
             {expression === 'crying_laugh' && (
               <>
-                {/* Cheerful squinting eyes */}
-                <path d="M 33 52 Q 38 45 43 52" stroke="#1F2937" strokeWidth="3" strokeLinecap="round" fill="none" />
-                <path d="M 57 52 Q 62 45 67 52" stroke="#1F2937" strokeWidth="3" strokeLinecap="round" fill="none" />
-                {/* Comedy tears */}
-                <path d="M 28 54 Q 24 58 26 62 Q 29 60 28 54" fill="#38BDF8" />
-                <path d="M 72 54 Q 76 58 74 62 Q 71 60 72 54" fill="#38BDF8" />
+                <path d="M 33 52 Q 38 45 43 52" stroke="#22231F" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                <path d="M 57 52 Q 62 45 67 52" stroke="#22231F" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                <circle cx="28" cy="58" r="2.5" fill="#777D5A" />
+                <circle cx="72" cy="58" r="2.5" fill="#777D5A" />
               </>
             )}
 
             {/* Dynamic Mouth */}
             {expression === 'neutral' && (
-              <line x1="45" y1="62" x2="55" y2="62" stroke="#1F2937" strokeWidth="2" strokeLinecap="round" />
+              <line x1="45" y1="62" x2="55" y2="62" stroke="#22231F" strokeWidth="1.5" strokeLinecap="round" />
             )}
 
             {expression === 'smirk' && (
-              <path d="M 44 62 Q 52 66 58 60" stroke="#1F2937" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+              <path d="M 44 62 Q 52 66 58 60" stroke="#22231F" strokeWidth="1.8" strokeLinecap="round" fill="none" />
             )}
 
             {expression === 'chuckle' && (
-              <path d="M 43 60 Q 50 67 57 60" stroke="#1F2937" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+              <path d="M 43 60 Q 50 67 57 60" stroke="#22231F" strokeWidth="2" strokeLinecap="round" fill="none" />
             )}
 
             {expression === 'giggle' && (
-              <path d="M 41 59 Q 50 71 59 59 Z" fill="#E11D48" />
+              <path d="M 41 59 Q 50 71 59 59 Z" fill="#C9A6A0" stroke="#22231F" strokeWidth="1" />
             )}
 
             {expression === 'crying_laugh' && (
-              <path d="M 38 58 Q 50 78 62 58 Z" fill="#BE123C" stroke="#881337" strokeWidth="1" />
+              <path d="M 38 58 Q 50 78 62 58 Z" fill="#22231F" stroke="#22231F" strokeWidth="1" />
             )}
           </svg>
         </motion.div>
 
         {/* Current joke / prompt speech bubble */}
-        <div className="relative mt-3 px-5 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-center max-w-md shadow-2xs">
-          <p className="text-xs sm:text-sm font-medium text-stone-700 italic">
-            &ldquo;{currentText}&rdquo;
+        <div className="relative mt-2 px-5 py-3 rounded-sm border border-paper-border bg-paper/70 text-center max-w-md">
+          <p className="text-xs sm:text-sm font-serif italic text-ink">
+            “{currentText}”
           </p>
         </div>
       </div>
@@ -221,62 +197,48 @@ export default function MakeHerLaugh({ onComplete }) {
       {/* Interactive Category Buttons */}
       {!isSuccess ? (
         <div className="grid grid-cols-2 gap-2.5">
-          <button
-            onClick={() => handleJokeClick('joke')}
-            className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs sm:text-sm font-bold transition-all active:scale-95 shadow-2xs"
-          >
-            <span>😂</span>
-            <span>Joke</span>
-          </button>
-
-          <button
-            onClick={() => handleJokeClick('roast')}
-            className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 text-xs sm:text-sm font-bold transition-all active:scale-95 shadow-2xs"
-          >
-            <span>😈</span>
-            <span>Roast</span>
-          </button>
-
-          <button
-            onClick={() => handleJokeClick('random')}
-            className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-xs sm:text-sm font-bold transition-all active:scale-95 shadow-2xs"
-          >
-            <span>🐸</span>
-            <span>Random</span>
-          </button>
-
-          <button
-            onClick={() => handleJokeClick('stupid')}
-            className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 text-xs sm:text-sm font-bold transition-all active:scale-95 shadow-2xs"
-          >
-            <span>💀</span>
-            <span>Extremely Stupid</span>
-          </button>
+          {[
+            { id: 'joke', label: 'Classic Joke', num: '01' },
+            { id: 'roast', label: 'Affectionate Roast', num: '02' },
+            { id: 'random', label: 'Absurd Fact', num: '03' },
+            { id: 'stupid', label: 'Extremely Stupid', num: '04' },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => handleJokeClick(cat.id)}
+              className="p-3 rounded-sm border border-paper-border bg-paper/60 hover:border-ink/70 text-ink text-xs font-mono tracking-wider uppercase transition-all cursor-pointer flex items-center justify-between"
+            >
+              <span>{cat.label}</span>
+              <span className="text-muted-text text-[10px]">{cat.num}</span>
+            </button>
+          ))}
         </div>
       ) : (
         /* Success Screen */
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center p-4 rounded-2xl bg-pink-50 border border-pink-200"
+          className="text-center p-6 rounded-sm border border-paper-border bg-paper/80 space-y-2"
         >
-          <h4 className="text-xl font-extrabold text-stone-800 font-display">
-            SUCCESS 😂
+          <span className="text-[10px] font-mono tracking-widest uppercase text-olive font-semibold">
+            TEST CONCLUDED
+          </span>
+          <h4 className="text-2xl font-serif text-ink">
+            Poker Face Broken. 😂
           </h4>
-          <p className="mt-1 text-sm font-handwriting text-xl text-pink-700">
-            That was objectively terrible.
-          </p>
-          <p className="text-xs text-stone-500 mt-0.5">
-            You successfully coaxed genuine laughter out of the universe.
+          <p className="text-xs font-sans text-muted-text">
+            Objectively terrible comedy coaxed genuine laughter out of the universe.
           </p>
 
-          <button
-            onClick={handleReset}
-            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-stone-800 text-white text-xs font-semibold hover:bg-stone-900 transition-all active:scale-95 shadow-xs"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Try More Jokes</span>
-          </button>
+          <div className="pt-3">
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 rounded-sm border border-paper-border hover:border-ink text-xs font-mono tracking-widest uppercase transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>TEST MORE JOKES</span>
+            </button>
+          </div>
         </motion.div>
       )}
     </div>

@@ -44,7 +44,7 @@ export default function CozyRoomHub({ onNavigate, onOpenSecret, currentTheme, on
     {
       id: 'heart',
       label: 'A Small Note',
-      desc: 'The quiet starlight letter from Sandyy',
+      desc: 'The quiet starlight letter from Sandeep',
       icon: '💌',
       badge: 'The Heart',
       color: 'from-indigo-50 via-purple-50 to-indigo-100/70 border-indigo-200/80',

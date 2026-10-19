@@ -7,46 +7,43 @@ export default {
   theme: {
     extend: {
       colors: {
+        paper: {
+          DEFAULT: '#F5F1E8',
+          light: '#FAF7F0',
+          dark: '#EBE5D8',
+        },
+        ink: {
+          DEFAULT: '#22231F',
+          soft: '#3A3B35',
+        },
+        'muted-text': '#77766D',
+        olive: {
+          DEFAULT: '#777D5A',
+          light: '#8E946E',
+          dark: '#5E6344',
+        },
+        chartreuse: {
+          DEFAULT: '#D8F36A',
+          hover: '#C8E653',
+        },
+        'paper-border': '#DAD5C9',
+        'muted-rose': '#C9A6A0',
+        ginger: '#C98555',
+        'dusty-pink': '#D7B8B0',
         cream: {
           50: '#FDFCF7',
           100: '#FAF7F0',
           200: '#F5EFEB',
           300: '#EDE4DC',
         },
-        pastelPink: {
-          100: '#FCE7F3',
-          200: '#FBCFE8',
-          300: '#F472B6',
-        },
-        mutedLavender: {
-          100: '#F3E8FF',
-          200: '#E9D5FF',
-          300: '#D8B4FE',
-          400: '#C084FC',
-        },
-        sage: {
-          100: '#DCFCE7',
-          200: '#BBF7D0',
-          300: '#86EFAC',
-          400: '#4ADE80',
-          500: '#22C55E',
-        },
-        softPeach: {
-          100: '#FFEDD5',
-          200: '#FED7AA',
-          300: '#FDBA74',
-        },
-        warmYellow: {
-          100: '#FEF9C3',
-          200: '#FEF08A',
-          300: '#FDE047',
-        },
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Nunito', 'sans-serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
-        display: ['Fraunces', 'Outfit', 'serif'],
-        handwriting: ['"Caveat"', '"Patrick Hand"', 'cursive'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        serif: ['Syne', '"Instrument Serif"', 'Georgia', 'serif'],
+        display: ['Syne', '"Space Grotesk"', 'sans-serif'],
+        heading: ['Syne', 'sans-serif'],
+        editorial: ['"Instrument Serif"', 'Georgia', 'serif'],
+        mono: ['"Space Grotesk"', 'monospace'],
       },
       boxShadow: {
         'soft': '0 10px 30px -5px rgba(216, 180, 254, 0.18), 0 4px 10px -2px rgba(251, 207, 232, 0.12)',

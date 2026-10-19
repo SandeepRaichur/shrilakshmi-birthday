@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Shuffle, RotateCcw } from 'lucide-react';
+import { Shuffle, RotateCcw } from 'lucide-react';
 import { playPaperFlip, playPop } from '../utils/audioEffects';
 import { shrilakshmiContent } from '../data/shrilakshmi';
 
 export default function LittleThingsSection() {
-  const { polaroids, littleThingsHeader } = shrilakshmiContent;
+  const { personalMessage, polaroids, profile, littleThingsHeader } = shrilakshmiContent;
   const cards = polaroids || [];
 
   const [flippedIds, setFlippedIds] = useState([]);
@@ -23,121 +23,167 @@ export default function LittleThingsSection() {
     setShuffleKey((k) => k + 1);
   };
 
+  const paragraphs = personalMessage?.paragraphs || [
+    "I didn't make this because I had something dramatic to say.",
+    "I just thought it would be nice to make something a little different for you.",
+    "So here it is.",
+    "Hope it made you smile.",
+  ];
+
+  const kannadaParagraphs = personalMessage?.kannadaParagraphs || [];
+
   return (
-    <section id="little-things" className="relative w-full max-w-5xl mx-auto px-4 py-20 flex flex-col items-center select-none">
-      {/* Section Header */}
-      <div className="text-center mb-12">
-        <span className="editorial-pill bg-pastelPink-100 text-pink-900 border border-pink-200/80 mb-3 shadow-2xs">
-          {littleThingsHeader?.badge || "💌 MEMORY PINBOARD · FLIP MAADI NODU"}
-        </span>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-stone-900 font-serif tracking-tight">
-          {littleThingsHeader?.title || "Little things"} ·{' '}
-          <span className="italic font-handwriting text-pink-700 font-bold text-3xl sm:text-4xl">
-            {littleThingsHeader?.kannadaTitle || "sanna vishayagalu"}
+    <section id="note" className="w-full max-w-5xl mx-auto px-6 sm:px-12 py-20 sm:py-28 select-none border-b border-paper-border">
+      
+      {/* -----------------------------------------------------------------------
+          PART 1: ASYMMETRICAL EDITORIAL SPREAD — "just a little note."
+          ----------------------------------------------------------------------- */}
+      <div className="pb-16 border-b border-paper-border grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        
+        {/* Left Column: Large Serif Headline (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          <span className="editorial-label text-muted-text">
+            {personalMessage?.badge || "05 — A LITTLE NOTE"}
           </span>
-        </h2>
-        <p className="text-stone-500 font-sans text-sm sm:text-base mt-2 max-w-md mx-auto leading-relaxed">
-          {littleThingsHeader?.subtitle || "Things you probably don't even realize matter · namboke kashta aadru idhe mukya."}
-        </p>
-
-        <button
-          onClick={handleShuffle}
-          className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/80 hover:bg-white text-stone-600 text-xs font-semibold border border-purple-200/60 shadow-2xs transition-all active:scale-95"
-        >
-          <Shuffle className="w-3.5 h-3.5 text-purple-600" />
-          <span>{littleThingsHeader?.shuffleButtonText || "Shuffle Polaroids · adal-badal maadu"}</span>
-        </button>
-      </div>
-
-      {/* Interactive Polaroid Grid */}
-      <div
-        key={shuffleKey}
-        className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
-      >
-        {cards.map((card, index) => {
-          const isFlipped = flippedIds.includes(card.id);
-          const defaultTilts = [-2.5, 2.8, -1.8, 3.2, -2.0, 1.8];
-          const tilt = card.tilt ?? defaultTilts[index % defaultTilts.length];
-
-          return (
-            <motion.div
-              key={card.id}
-              whileHover={{ y: -6, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => toggleFlip(card.id)}
-              style={{ rotate: `${tilt}deg` }}
-              className="relative cursor-pointer min-h-[260px] rounded-3xl bg-white p-5 shadow-polaroid border border-stone-200/70 flex flex-col justify-between transition-all group perspective-1000"
-            >
-              {/* Cute Washi Tape at Top */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-5 washi-tape-pink rounded-xs pointer-events-none" />
-
-              {!isFlipped ? (
-                /* Front Side: Photo Style */
-                <div className="flex flex-col h-full justify-between pt-2">
-                  <div className="w-full h-32 rounded-2xl bg-gradient-to-br from-stone-100 to-purple-50/60 border border-stone-200/40 flex items-center justify-center text-4xl shadow-inner group-hover:scale-[1.02] transition-transform">
-                    {card.emoji || "🌸"}
-                  </div>
-
-                  <div className="mt-4">
-                    <span className="text-[10px] font-mono tracking-widest text-stone-400 font-bold uppercase">
-                      {card.frontTag || "MEMORY NOTE"}
-                    </span>
-                    <h3 className="font-serif font-bold text-stone-900 text-lg leading-snug mt-0.5">
-                      {card.title}
-                    </h3>
-                  </div>
-
-                  <div className="mt-3 pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-purple-700 font-bold">
-                    <span>Tap to flip ↺</span>
-                    <span className="text-[10px] text-stone-300 font-mono">MEMO #{card.id}</span>
-                  </div>
-                </div>
-              ) : (
-                /* Back Side: Handwritten Note */
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex flex-col h-full justify-between p-2 pt-3"
-                >
-                  <div>
-                    <span className="text-[10px] font-mono tracking-widest text-purple-700 font-bold uppercase">
-                      INSIDE THOUGHT
-                    </span>
-                    <p className="mt-2 text-stone-800 font-handwriting text-xl sm:text-2xl leading-relaxed">
-                      &ldquo;{card.backNote}&rdquo;
-                    </p>
-                  </div>
-
-                  <div className="mt-4 pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
-                    <span className="text-purple-600 font-bold">Flip back ↻</span>
-                    <span className="text-[10px] font-mono">Shrilakshmi Lore</span>
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Bottom Reflection Quote */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-        className="relative mt-16 text-center max-w-lg p-8 sm:p-10 rounded-[2.5rem] bg-gradient-to-b from-white via-purple-50/40 to-amber-50/30 border border-purple-200/80 shadow-glass"
-      >
-        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-100 border border-purple-200 flex items-center justify-center text-xl shadow-2xs">
-          📖
+          <h2 className="text-5xl sm:text-7xl font-serif text-ink leading-[0.9]">
+            {personalMessage?.heading || "just a little note."}
+          </h2>
+          {personalMessage?.kannadaSubtitle && (
+            <p className="text-xs font-mono text-muted-text uppercase tracking-widest mt-2">
+              [{personalMessage.kannadaSubtitle}]
+            </p>
+          )}
         </div>
 
-        <p className="text-lg sm:text-xl text-stone-700 font-serif italic leading-relaxed">
-          &ldquo;Some moments don&apos;t look important while they&apos;re happening.
-        </p>
-        <p className="text-lg sm:text-xl font-bold text-purple-950 font-serif mt-1">
-          Somehow, they become memories anyway.&rdquo;
-        </p>
-      </motion.div>
+        {/* Right Column: Narrow Text Column & Restrained Paragraphs (7 cols) */}
+        <div className="lg:col-span-7 lg:pl-8 space-y-6">
+          <div className="space-y-4 text-base sm:text-lg text-ink font-sans leading-relaxed">
+            {paragraphs.map((para, i) => (
+              <p
+                key={i}
+                className={i === 2 ? "font-serif italic text-xl sm:text-2xl text-ink" : ""}
+              >
+                {para}
+              </p>
+            ))}
+          </div>
+
+          {/* Optional Kannada Parallel Paragraphs */}
+          {kannadaParagraphs.length > 0 && (
+            <div className="pt-4 border-t border-paper-border/60 space-y-2 text-xs sm:text-sm font-mono text-muted-text">
+              {kannadaParagraphs.map((kp, ki) => (
+                <p key={ki}>[{kp}]</p>
+              ))}
+            </div>
+          )}
+
+          {/* Understated Signature */}
+          <div className="pt-6 border-t border-paper-border flex flex-col items-start gap-1">
+            <span className="text-2xl sm:text-3xl font-serif italic text-ink font-normal">
+              {personalMessage?.signature || profile?.signature || "— Sandeep"}
+            </span>
+            <span className="text-[11px] font-mono text-muted-text">
+              {personalMessage?.authorTransliteration || profile?.authorTransliteration || "nanna hesaru sandeep · made with care for Shrilakshmi"}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      {/* -----------------------------------------------------------------------
+          PART 2: ARCHIVED MEMORY MEMOS (FLIPPABLE NOTES)
+          ----------------------------------------------------------------------- */}
+      <div className="pt-16">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between pb-8 border-b border-paper-border gap-4">
+          <div>
+            <span className="text-[10px] font-mono tracking-widest uppercase text-olive font-semibold">
+              APPENDIX · LITTLE THINGS
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-serif text-ink mt-1">
+              {littleThingsHeader?.title || "Little things"} ·{" "}
+              <span className="italic font-normal">{littleThingsHeader?.kannadaTitle || "sanna vishayagalu"}</span>
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-text font-sans mt-1 max-w-md">
+              {littleThingsHeader?.subtitle || "Things you probably don't even realize matter."}
+            </p>
+          </div>
+
+          <button
+            onClick={handleShuffle}
+            className="self-start sm:self-auto px-3.5 py-1.5 rounded-sm border border-paper-border text-muted-text hover:text-ink text-xs font-mono tracking-wider uppercase transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Shuffle className="w-3.5 h-3.5" />
+            <span>SHUFFLE MEMOS</span>
+          </button>
+        </div>
+
+        {/* Memos Grid */}
+        <div
+          key={shuffleKey}
+          className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {cards.map((card, index) => {
+            const isFlipped = flippedIds.includes(card.id);
+
+            return (
+              <div
+                key={card.id}
+                onClick={() => toggleFlip(card.id)}
+                className="group relative min-h-[220px] rounded-sm border border-paper-border bg-paper p-6 flex flex-col justify-between cursor-pointer hover:border-ink/70 transition-all duration-200"
+              >
+                {!isFlipped ? (
+                  /* Front: Restrained Editorial Memo */
+                  <div className="flex flex-col h-full justify-between space-y-4">
+                    <div className="flex items-center justify-between text-[10px] font-mono">
+                      <span className="text-olive font-semibold tracking-wider uppercase">
+                        {card.frontTag || "MEMORY NOTE"}
+                      </span>
+                      <span className="text-muted-text">#0{card.id}</span>
+                    </div>
+
+                    <div>
+                      <h4 className="text-lg sm:text-xl font-serif text-ink group-hover:text-olive transition-colors leading-snug">
+                        {card.title}
+                      </h4>
+                    </div>
+
+                    <div className="pt-3 border-t border-paper-border/60 flex items-center justify-between text-[10px] font-mono text-muted-text">
+                      <span>TAP TO READ NOTE</span>
+                      <RotateCcw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-300" />
+                    </div>
+                  </div>
+                ) : (
+                  /* Back: Note Content */
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col h-full justify-between space-y-4"
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-mono text-muted-text">
+                      <span>DEBRIEF #{card.id}</span>
+                      <span>TURN OVER ↺</span>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-ink font-sans leading-relaxed">
+                      {card.backNote}
+                    </p>
+
+                    <div className="pt-2 border-t border-paper-border/60 text-[10px] font-mono text-olive font-semibold">
+                      VERIFIED MEMORY
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Footnote */}
+      <div className="pt-6 mt-12 flex items-center justify-between text-[11px] font-mono text-muted-text">
+        <span>EDITORIAL CORRESPONDENCE</span>
+        <span>NO RESPONSES REQUIRED</span>
+      </div>
     </section>
   );
 }

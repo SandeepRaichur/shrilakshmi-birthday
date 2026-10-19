@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, RefreshCw, Check } from 'lucide-react';
+import { RefreshCw, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { playPop, playChime, playSuccess } from '../../utils/audioEffects';
 import { shrilakshmiContent } from '../../data/shrilakshmi';
 
 const DEFAULT_HIDDEN_ITEMS = [
-  { id: 'flower', label: 'Flower', emoji: '🌸', x: 24, y: 38, message: "You found it! The plant was feeling shy." },
-  { id: 'cup', label: 'Cup', emoji: '☕', x: 62, y: 68, message: "Okay detective. 👀 Coffee was getting cold anyway." },
-  { id: 'star', label: 'Star', emoji: '⭐', x: 82, y: 22, message: "How did you notice that? Shining bright in the corner." },
-  { id: 'headphones', label: 'Headphones', emoji: '🎧', x: 44, y: 62, message: "Tune in! Playing good vibes only." },
+  { id: 'flower', label: 'Flower', emoji: '🌸', x: 24, y: 38, message: "You found it! Plant was feeling shy." },
+  { id: 'cup', label: 'Cup', emoji: '☕', x: 62, y: 68, message: "Okay detective. Tea was getting cold anyway." },
+  { id: 'star', label: 'Star', emoji: '⭐', x: 82, y: 22, message: "Shining bright in the top corner." },
+  { id: 'headphones', label: 'Headphones', emoji: '🎧', x: 44, y: 62, message: "Playing good vibes only." },
   { id: 'envelope', label: 'Envelope', emoji: '💌', x: 35, y: 78, message: "A little note tucked away. Sneaky!" },
   { id: 'butterfly', label: 'Butterfly', emoji: '🦋', x: 15, y: 18, message: "Fluttered right into your view!" },
 ];
 
-export default function MemoryHunt({ onComplete }) {
+export default function MemoryHunt({ onDiscoveryUnlocked }) {
   const hiddenItems = shrilakshmiContent.games?.memoryHunt?.items || DEFAULT_HIDDEN_ITEMS;
   const gameTitle = shrilakshmiContent.games?.memoryHunt?.title || "Memory Hunt";
   const [foundIds, setFoundIds] = useState([]);
@@ -34,13 +34,13 @@ export default function MemoryHunt({ onComplete }) {
         setIsFinished(true);
         playSuccess();
         confetti({
-          particleCount: 50,
-          spread: 70,
+          particleCount: 45,
+          spread: 60,
           origin: { y: 0.6 },
-          colors: ['#F472B6', '#38BDF8', '#FDE047'],
+          colors: ['#777D5A', '#D8F36A', '#22231F'],
         });
-        if (onComplete) onComplete();
-      }, 900);
+        if (onDiscoveryUnlocked) onDiscoveryUnlocked('arcade_memory');
+      }, 700);
     }
   };
 
@@ -52,153 +52,119 @@ export default function MemoryHunt({ onComplete }) {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto p-6 sm:p-8 rounded-[2.5rem] bg-white/95 backdrop-blur-xl border border-white/90 shadow-glass">
+    <div className="w-full max-w-xl mx-auto p-6 sm:p-8 rounded-sm bg-paper border border-paper-border text-ink">
+      
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-stone-100 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2.5 rounded-2xl bg-amber-100 text-amber-800 shadow-2xs">
-            <Search className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-bold text-stone-900 text-xl font-serif tracking-tight">
-              {gameTitle}
-            </h3>
-            <p className="text-xs text-stone-500 font-sans">
-              Tap the hidden objects scattered in the room
-            </p>
-          </div>
+      <div className="flex items-center justify-between pb-4 border-b border-paper-border mb-6">
+        <div>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-olive font-semibold">
+            ACTIVITY #02 · COZY DISCOVERY HUNT
+          </span>
+          <h4 className="text-xl sm:text-2xl font-serif text-ink mt-0.5">
+            {gameTitle}
+          </h4>
         </div>
 
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-          {foundIds.length}/{hiddenItems.length} Found
+        <span className="text-xs font-mono text-muted-text border border-paper-border px-2.5 py-1 rounded-sm">
+          {foundIds.length} / {hiddenItems.length} FOUND
         </span>
       </div>
 
-      {/* Target Items Checklist Bar */}
-      <div className="grid grid-cols-6 gap-2 mb-4 bg-stone-50 p-2.5 rounded-2xl border border-stone-100">
+      {/* Target Items Checklist */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
         {hiddenItems.map((item) => {
           const isFound = foundIds.includes(item.id);
+
           return (
             <div
               key={item.id}
-              className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition-all ${
+              className={`px-3 py-1 rounded-sm border text-xs font-mono flex items-center gap-1.5 transition-all ${
                 isFound
-                  ? 'bg-amber-100/70 border border-amber-300'
-                  : 'bg-white border border-stone-200/60 opacity-40 grayscale'
+                  ? 'border-olive bg-olive text-paper font-semibold'
+                  : 'border-paper-border bg-paper/60 text-muted-text'
               }`}
             >
-              <span className="text-base sm:text-lg">{item.emoji}</span>
-              <span className="text-[10px] font-medium text-stone-600 mt-0.5 truncate w-full text-center">
-                {item.label}
-              </span>
+              <span>{item.emoji}</span>
+              <span>{item.label}</span>
+              {isFound && <span className="text-[10px] ml-0.5">✓</span>}
             </div>
           );
         })}
       </div>
 
-      {/* Illustrated Cozy Room Scene */}
-      <div className="relative w-full h-72 sm:h-80 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-amber-50/50 border border-purple-100 overflow-hidden select-none">
-        {/* Background Room Architecture: Window */}
-        <div className="absolute top-4 right-6 w-28 h-28 rounded-2xl border-4 border-white/90 bg-gradient-to-b from-indigo-950 via-slate-900 to-indigo-900 shadow-inner overflow-hidden">
-          {/* Moon in window */}
-          <div className="absolute top-3 right-4 text-xs">🌙</div>
-          <div className="absolute top-7 left-3 w-1 h-1 bg-white rounded-full animate-ping" />
-        </div>
+      {!isFinished ? (
+        <>
+          {/* Studio Canvas with Hidden Objects */}
+          <div className="relative w-full aspect-[16/10] rounded-sm border border-paper-border bg-paper/80 overflow-hidden shadow-2xs select-none">
+            {/* Ambient Room Grid Lines */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to right, #DAD5C9 1px, transparent 1px), linear-gradient(to bottom, #DAD5C9 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        {/* Bookshelf on left */}
-        <div className="absolute top-10 left-6 w-24 h-40 border-r-2 border-stone-300/40 flex flex-col justify-between py-2">
-          <div className="w-20 h-2 bg-amber-200/70 rounded-sm" />
-          {/* Books */}
-          <div className="flex gap-1 items-end px-1">
-            <div className="w-3 h-14 bg-rose-300 rounded-xs" />
-            <div className="w-4 h-16 bg-purple-300 rounded-xs" />
-            <div className="w-3 h-12 bg-teal-300 rounded-xs" />
+            {/* Room Furniture silhouettes */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 border-t border-paper-border/60 bg-paper-border/20 pointer-events-none" />
+            <div className="absolute bottom-16 left-6 w-24 h-28 border border-paper-border/60 rounded-sm pointer-events-none opacity-40" />
+            <div className="absolute top-6 right-8 w-20 h-28 border border-paper-border/60 rounded-sm pointer-events-none opacity-40" />
+
+            {/* Hidden Clickable Objects */}
+            {hiddenItems.map((item) => {
+              const isFound = foundIds.includes(item.id);
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleObjectClick(item)}
+                  style={{ left: `${item.x}%`, top: `${item.y}%` }}
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 p-2 rounded-sm transition-transform cursor-pointer ${
+                    isFound
+                      ? 'scale-125 opacity-100 ring-1 ring-olive bg-olive/15'
+                      : 'opacity-70 hover:opacity-100 hover:scale-120'
+                  }`}
+                  title={item.label}
+                >
+                  <span className="text-xl sm:text-2xl block">{item.emoji}</span>
+                </button>
+              );
+            })}
           </div>
-          <div className="w-20 h-2 bg-amber-200/70 rounded-sm" />
-          <div className="flex gap-1 items-end px-1">
-            <div className="w-4 h-14 bg-amber-300 rounded-xs" />
-            <div className="w-3 h-10 bg-indigo-300 rounded-xs" />
-          </div>
-          <div className="w-20 h-2 bg-amber-200/70 rounded-sm" />
-        </div>
 
-        {/* Cozy Study Desk & Chair */}
-        <div className="absolute bottom-6 left-1/4 right-12 h-24 bg-white/70 backdrop-blur-xs rounded-xl border border-stone-200 shadow-xs flex items-center justify-around px-4">
-          {/* Desk Lamp */}
-          <div className="w-4 h-12 bg-amber-400/80 rounded-t-full shadow-xs" />
-          {/* Laptop */}
-          <div className="w-16 h-10 bg-stone-300 rounded-md border border-stone-400/60 shadow-xs flex items-center justify-center">
-            <span className="text-[8px] text-stone-500 font-mono">coder</span>
-          </div>
-          {/* Notepad */}
-          <div className="w-8 h-10 bg-yellow-100 rounded-xs border border-yellow-200 shadow-2xs rotate-6" />
-        </div>
-
-        {/* Cozy Rug on Floor */}
-        <div className="absolute -bottom-6 left-12 right-12 h-14 rounded-full bg-pastelPink-100/60 border border-pink-200/40" />
-
-        {/* Clickable Hidden Items Placed Inside the Scene */}
-        {hiddenItems.map((item) => {
-          const isFound = foundIds.includes(item.id);
-          return (
-            <motion.button
-              key={item.id}
-              onClick={() => handleObjectClick(item)}
-              whileHover={{ scale: 1.25 }}
-              whileTap={{ scale: 0.9 }}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 text-xl sm:text-2xl cursor-pointer p-1.5 rounded-full transition-transform ${
-                isFound
-                  ? 'opacity-30 cursor-default pointer-events-none'
-                  : 'hover:bg-white/70 active:scale-95'
-              }`}
-              style={{ left: `${item.x}%`, top: `${item.y}%` }}
-              title={isFound ? 'Already found' : 'Click me!'}
-            >
-              <span>{item.emoji}</span>
-              {!isFound && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              )}
-            </motion.button>
-          );
-        })}
-
-        {/* Flash Message when an object is found */}
-        <AnimatePresence>
+          {/* Active Discovery Feedback */}
           {activeMessage && (
             <motion.div
-              key={activeMessage}
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute bottom-2 inset-x-4 bg-stone-900/85 backdrop-blur-md text-white text-xs sm:text-sm py-2 px-3 rounded-xl text-center shadow-lg font-medium"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 p-3 rounded-sm border border-paper-border bg-paper/90 text-xs font-mono text-olive font-medium text-center"
             >
-              {activeMessage}
+              DISCOVERY LOG: {activeMessage}
             </motion.div>
           )}
-        </AnimatePresence>
-      </div>
-
-      {/* Completion Dialog */}
-      {isFinished && (
+        </>
+      ) : (
+        /* Finished State */
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center"
+          className="text-center py-8 space-y-4"
         >
-          <div className="inline-flex items-center gap-1.5 text-emerald-800 font-bold text-sm sm:text-base font-display">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span>Memory Hunt complete ✨</span>
+          <div className="w-10 h-10 rounded-full border border-olive text-olive mx-auto flex items-center justify-center">
+            <CheckCircle2 className="w-5 h-5" />
           </div>
-          <p className="text-xs text-stone-600 mt-1">
-            Impressive eye for detail, Shrilakshmi! Found every single memory artifact.
+
+          <h4 className="text-2xl sm:text-3xl font-serif text-ink">
+            All 6 Objects Located.
+          </h4>
+
+          <p className="text-sm font-sans text-muted-text max-w-sm mx-auto leading-relaxed">
+            Master detective instincts verified. Zero details escaped your keen observation.
           </p>
-          <button
-            onClick={handleReset}
-            className="mt-3 inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white text-stone-700 hover:text-stone-900 text-xs font-semibold border border-stone-200 shadow-xs"
-          >
-            <RefreshCw className="w-3 h-3" />
-            <span>Play Again</span>
-          </button>
+
+          <div className="pt-4">
+            <button
+              onClick={handleReset}
+              className="px-5 py-2.5 rounded-sm border border-paper-border hover:border-ink text-xs font-mono tracking-widest uppercase transition-colors inline-flex items-center gap-2 cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>HUNT AGAIN</span>
+            </button>
+          </div>
         </motion.div>
       )}
     </div>

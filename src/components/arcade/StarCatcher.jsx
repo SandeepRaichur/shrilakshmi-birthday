@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Moon, Play, RefreshCw, Star } from 'lucide-react';
+import { Play, RefreshCw, Star } from 'lucide-react';
 import { playSparkle, playChime, playSecretSound, playPop } from '../../utils/audioEffects';
 
 // Constellation coordinates for letter 'S' (percentages inside a 100x100 space)
@@ -15,7 +15,7 @@ const S_CONSTELLATION = [
   { x: 34, y: 76 }, // bottom left curve
 ];
 
-export default function StarCatcher({ onComplete }) {
+export default function StarCatcher({ onDiscoveryUnlocked }) {
   const [gameState, setGameState] = useState('idle'); // idle, catching, constellation
   const [basketX, setBasketX] = useState(50);
   const [stars, setStars] = useState([]);
@@ -73,43 +73,47 @@ export default function StarCatcher({ onComplete }) {
           ...prev,
           {
             id: Math.random(),
-            x: Math.floor(Math.random() * 76 + 12),
+            x: Math.floor(Math.random() * 75 + 12),
             y: 0,
-            speed: 0.9 + Math.random() * 0.6,
-            size: Math.floor(Math.random() * 6 + 16),
+            speed: 1.2 + Math.random() * 0.7,
+            size: Math.floor(Math.random() * 8 + 14),
           },
         ]);
       }
 
-      // Move stars & test catch
+      // Move stars
       setStars((prev) => {
         const next = [];
         const currentBasket = basketXRef.current;
 
-        for (const star of prev) {
-          const nextY = star.y + star.speed;
+        for (const s of prev) {
+          const nextY = s.y + s.speed;
 
-          // Catch collision near basket
-          if (nextY >= 82 && nextY <= 94 && Math.abs(star.x - currentBasket) < 16) {
-            playChime(650 + Math.random() * 300);
-            setCaughtCount((c) => {
-              const updated = c + 1;
-              if (updated >= targetStars) {
-                // Trigger constellation reveal!
-                setTimeout(() => {
-                  setGameState('constellation');
-                  playSecretSound();
-                  if (onComplete) onComplete();
-                }, 400);
-              }
-              return updated;
-            });
-            continue;
+          // Check if caught by player's cloud/net (y >= 80)
+          if (nextY >= 80 && nextY <= 94) {
+            const hitDistance = Math.abs(s.x - currentBasket);
+            if (hitDistance < 14) {
+              // Caught!
+              playChime(600 + caughtCount * 45);
+              setCaughtCount((c) => {
+                const nextCount = c + 1;
+                if (nextCount >= targetStars) {
+                  // Finish!
+                  setTimeout(() => {
+                    setGameState('constellation');
+                    playSecretSound();
+                    if (onDiscoveryUnlocked) onDiscoveryUnlocked('arcade_stars');
+                  }, 400);
+                }
+                return nextCount;
+              });
+              continue;
+            }
           }
 
-          if (nextY > 100) continue; // Out of bounds
+          if (nextY > 100) continue; // Fell off screen
 
-          next.push({ ...star, y: nextY });
+          next.push({ ...s, y: nextY });
         }
         return next;
       });
@@ -123,177 +127,148 @@ export default function StarCatcher({ onComplete }) {
       isRunning = false;
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [gameState, onComplete]);
+  }, [gameState, caughtCount, onDiscoveryUnlocked]);
 
   return (
-    <div className="w-full max-w-xl mx-auto p-6 sm:p-8 rounded-[2.5rem] bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-stone-100 shadow-glass border border-indigo-500/30">
+    <div className="w-full max-w-xl mx-auto p-6 sm:p-8 rounded-sm bg-paper border border-paper-border text-ink">
+      
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-indigo-800/60 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2.5 rounded-2xl bg-indigo-900/80 text-amber-300 border border-indigo-700/50 shadow-2xs">
-            <Moon className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-bold text-white text-xl font-serif tracking-tight">
-              Star Catcher
-            </h3>
-            <p className="text-xs text-indigo-300 font-sans">
-              Catch 8 stars in the night sky
-            </p>
-          </div>
+      <div className="flex items-center justify-between pb-4 border-b border-paper-border mb-6">
+        <div>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-olive font-semibold">
+            ACTIVITY #05 · CELESTIAL STARGROWTH
+          </span>
+          <h4 className="text-xl sm:text-2xl font-serif text-ink mt-0.5">
+            Star Catcher
+          </h4>
         </div>
 
-        {gameState === 'catching' && (
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-950 text-amber-300 border border-indigo-700">
-            ⭐ {caughtCount}/{targetStars}
-          </span>
-        )}
+        <span className="text-xs font-mono text-muted-text border border-paper-border px-2.5 py-1 rounded-sm">
+          {caughtCount} / {targetStars} STARS COLLECTED
+        </span>
       </div>
 
-      {/* Main Night Sky Container */}
+      {/* Playfield Area */}
       <div
         ref={containerRef}
         onMouseMove={handlePointerMove}
         onTouchMove={handlePointerMove}
-        className="relative w-full h-80 rounded-2xl bg-gradient-to-b from-[#0F172A] via-[#1E1B4B] to-[#2E1065] border border-indigo-800/50 overflow-hidden select-none touch-none flex flex-col justify-between"
+        className="relative w-full h-80 rounded-sm bg-paper/60 border border-paper-border overflow-hidden select-none touch-none flex flex-col justify-between"
       >
-        {/* Soft background ambient stars */}
-        <div className="absolute inset-0 pointer-events-none opacity-40">
-          {[...Array(14)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-white animate-pulse"
-              style={{
-                left: `${(i * 17) % 95}%`,
-                top: `${(i * 23) % 85}%`,
-                animationDelay: `${i * 0.3}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* IDLE STATE */}
         {gameState === 'idle' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-20 bg-slate-950/70 backdrop-blur-xs">
-            <span className="text-4xl mb-3 animate-float-slow">🌙✨</span>
-            <h4 className="text-lg font-bold text-white font-display">
-              A Quiet Night Under The Stars
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-paper/90 z-20 space-y-4">
+            <span className="text-xs font-mono tracking-widest uppercase text-olive font-semibold">
+              INSTRUCTIONS
+            </span>
+            <h4 className="text-2xl font-serif text-ink">
+              Stargazing Coordinate.
             </h4>
-            <p className="text-xs text-indigo-200 max-w-xs mt-1 mb-5">
-              Glide the glowing cloud collector to gather starlight. Something special happens when you collect enough.
+            <p className="text-xs font-sans text-muted-text max-w-xs leading-relaxed">
+              Catch 8 falling starlight points to form a celestial constellation for Shrilakshmi.
             </p>
             <button
               onClick={startCatching}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-900 font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95"
+              className="px-6 py-2.5 rounded-sm bg-ink text-paper text-xs font-mono tracking-widest uppercase hover:bg-olive transition-colors flex items-center gap-2 cursor-pointer shadow-2xs"
             >
-              <Play className="w-4 h-4 fill-stone-900" />
-              <span>Begin Stargazing</span>
+              <Play className="w-3.5 h-3.5" />
+              <span>START CATCHING</span>
             </button>
           </div>
         )}
 
-        {/* CATCHING STATE */}
         {gameState === 'catching' && (
           <>
             {/* Falling Stars */}
             {stars.map((star) => (
               <div
                 key={star.id}
-                className="absolute -translate-x-1/2 pointer-events-none select-none text-amber-300 filter drop-shadow-[0_0_8px_rgba(252,211,77,0.7)]"
+                className="absolute -translate-x-1/2 pointer-events-none select-none text-olive font-mono font-bold"
                 style={{
                   left: `${star.x}%`,
                   top: `${star.y}%`,
                   fontSize: `${star.size}px`,
                 }}
               >
-                ⭐
+                ✦
               </div>
             ))}
 
-            {/* Glowing Cloud Basket */}
+            {/* Catcher Basket / Marker */}
             <div
               className="absolute bottom-4 -translate-x-1/2 pointer-events-none transition-all duration-75 flex flex-col items-center"
               style={{ left: `${basketX}%` }}
             >
-              <div className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.4)] flex items-center gap-1">
-                <span className="text-lg">☁️</span>
-                <span className="text-[10px] font-bold text-amber-200">Shri</span>
-              </div>
+              <div className="w-12 h-2 bg-ink rounded-full" />
+              <span className="text-[9px] font-mono uppercase tracking-widest text-muted-text mt-1">
+                SHRI
+              </span>
             </div>
 
             <div className="absolute top-2 inset-x-0 text-center pointer-events-none">
-              <span className="text-[10px] text-indigo-300/80 bg-slate-900/60 px-2 py-0.5 rounded-full">
-                Drag cloud to catch stars
+              <span className="text-[10px] font-mono text-muted-text/80 uppercase tracking-widest">
+                DRAG CATCHER LEFT & RIGHT
               </span>
             </div>
           </>
         )}
 
-        {/* CONSTELLATION REVEAL STATE (Forms the letter 'S') */}
+        {/* Constellation Reveal State */}
         {gameState === 'constellation' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="absolute inset-0 flex flex-col items-center justify-center p-4 z-20 bg-gradient-to-b from-[#0F172A]/90 via-[#1E1B4B]/95 to-[#2E1065]/95"
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 flex flex-col items-center justify-center p-6 z-20 bg-paper/95 space-y-3"
           >
-            {/* Constellation SVG lines and stars */}
-            <div className="relative w-48 h-48 mb-2">
-              <svg viewBox="0 0 100 100" className="w-full h-full filter drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
-                {/* Golden Constellation Lines connecting into 'S' */}
+            {/* Constellation Vector lines connecting into 'S' */}
+            <div className="relative w-44 h-44 mb-1">
+              <svg viewBox="0 0 100 100" className="w-full h-full">
                 <motion.path
                   d="M 65 22 Q 50 16 35 25 Q 42 44 60 56 Q 62 75 50 84 Q 34 76 34 76"
                   fill="none"
-                  stroke="#FDE047"
-                  strokeWidth="2"
-                  strokeDasharray="3 3"
+                  stroke="#777D5A"
+                  strokeWidth="1.5"
+                  strokeDasharray="2 2"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.5, ease: 'easeInOut' }}
+                  transition={{ duration: 1.2, ease: 'easeInOut' }}
                 />
 
-                {/* Star Nodes along the 'S' */}
                 {S_CONSTELLATION.map((pt, i) => (
                   <motion.g
                     key={i}
                     initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: [0, 1.3, 1], opacity: 1 }}
-                    transition={{ delay: 0.15 * i, duration: 0.5 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1 * i, duration: 0.4 }}
                   >
-                    <circle cx={pt.x} cy={pt.y} r="3" fill="#FEF08A" />
-                    <circle cx={pt.x} cy={pt.y} r="6" fill="#FBBF24" opacity="0.3" className="animate-ping" />
+                    <circle cx={pt.x} cy={pt.y} r="2.5" fill="#22231F" />
+                    <circle cx={pt.x} cy={pt.y} r="4.5" stroke="#777D5A" strokeWidth="0.8" fill="none" />
                   </motion.g>
                 ))}
               </svg>
 
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="text-3xl font-extrabold text-amber-200/20 font-serif">
+                <span className="text-4xl font-serif text-ink/15">
                   S
                 </span>
               </div>
             </div>
 
-            {/* Required message */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.6 }}
-              className="text-center"
-            >
-              <p className="text-xs font-semibold text-amber-300 font-handwriting text-lg">
-                Constellation &ldquo;S&rdquo; Formed ✨
+            <div className="text-center space-y-1">
+              <p className="text-xs font-mono tracking-widest uppercase text-olive font-semibold">
+                CONSTELLATION “S” FORMED
               </p>
-              <p className="text-xs text-indigo-200 mt-0.5">
-                okay, that&apos;s enough showing off. 😂
+              <p className="text-xs font-sans text-muted-text">
+                Eight celestial coordinates locked. Okay, that's enough showing off. 😂
               </p>
-            </motion.div>
+            </div>
 
             <button
               onClick={startCatching}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-indigo-900/80 hover:bg-indigo-800 text-amber-300 text-xs font-medium border border-indigo-700 transition-all active:scale-95"
+              className="mt-2 px-4 py-2 rounded-sm border border-paper-border hover:border-ink text-xs font-mono tracking-widest uppercase transition-colors inline-flex items-center gap-1.5 cursor-pointer"
             >
-              <RefreshCw className="w-3 h-3" />
-              <span>Catch Again</span>
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>CATCH AGAIN</span>
             </button>
           </motion.div>
         )}
