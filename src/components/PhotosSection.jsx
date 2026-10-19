@@ -83,7 +83,7 @@ export default function PhotosSection() {
       </div>
 
       {/* -----------------------------------------------------------------------
-          THE 3 CURATED COLLECTIONS (PERFECTLY ALIGNED GRIDS)
+          THE 3 CURATED COLLECTIONS (100% IDENTICAL SIZING & BULLETPROOF ALIGNMENT)
           ----------------------------------------------------------------------- */}
       <div className="space-y-24 pt-16">
         {collections.map((col) => {
@@ -124,14 +124,15 @@ export default function PhotosSection() {
                       <div
                         key={img.id}
                         onClick={() => handleOpenLightbox(globalIdx)}
-                        className="group bg-paper-light p-3 border border-paper-border hover:border-ink/60 rounded-xs shadow-2xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                        className="group bg-paper-light p-3 border border-paper-border hover:border-ink/60 rounded-xs shadow-2xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col"
                       >
-                        {/* Uniform Aspect Ratio */}
-                        <div className="relative aspect-4/5 w-full overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
+                        {/* 100% Uniform 4:5 Aspect Ratio Container with Absolute Pinned Image */}
+                        <div className="relative w-full aspect-[4/5] overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
                           <img
                             src={img.src}
                             alt={img.alt}
-                            className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                            style={{ objectPosition: img.objectPosition || 'center top' }}
+                            className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-103 transition-transform duration-500"
                             loading="lazy"
                           />
                           <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -142,7 +143,7 @@ export default function PhotosSection() {
                         </div>
 
                         {/* Perfectly Aligned Bottom Strip */}
-                        <div className="mt-3 pt-2.5 border-t border-paper-border/60 flex items-center justify-between text-xs font-mono text-muted-text">
+                        <div className="mt-3 pt-2 border-t border-paper-border/60 flex items-center justify-between text-xs font-mono text-muted-text">
                           <span className="font-medium text-ink">FRAME #{img.number}</span>
                           <span className="text-[10px] text-olive font-bold uppercase tracking-wider">ARCHIVAL</span>
                         </div>
@@ -152,7 +153,7 @@ export default function PhotosSection() {
                 </div>
               )}
 
-              {/* COLLECTION 02: THE SHRILAKSHMI FILES (16 Photos Uniform Aligned Grid) */}
+              {/* COLLECTION 02: THE SHRILAKSHMI FILES (16 Photos Uniform 4-Col Grid) */}
               {col.id === 'individual' && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                   {col.images.map((img) => {
@@ -162,14 +163,15 @@ export default function PhotosSection() {
                       <div
                         key={img.id}
                         onClick={() => handleOpenLightbox(globalIdx)}
-                        className="group bg-paper-light p-3 border border-paper-border hover:border-ink/60 rounded-xs shadow-2xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                        className="group bg-paper-light p-3 border border-paper-border hover:border-ink/60 rounded-xs shadow-2xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col"
                       >
-                        {/* Uniform Aspect Ratio: Perfectly Aligned Everywhere */}
-                        <div className="relative aspect-4/5 w-full overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
+                        {/* 100% Uniform 4:5 Aspect Ratio Container with Absolute Pinned Image */}
+                        <div className="relative w-full aspect-[4/5] overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
                           <img
                             src={img.src}
                             alt={img.alt}
-                            className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                            style={{ objectPosition: img.objectPosition || 'center top' }}
+                            className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-103 transition-transform duration-500"
                             loading="lazy"
                           />
                           <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -180,7 +182,7 @@ export default function PhotosSection() {
                         </div>
 
                         {/* Perfectly Aligned Bottom Strip */}
-                        <div className="mt-3 pt-2.5 border-t border-paper-border/60 flex items-center justify-between text-xs font-mono">
+                        <div className="mt-3 pt-2 border-t border-paper-border/60 flex items-center justify-between text-xs font-mono">
                           <span className="text-muted-text text-[11px] truncate pr-2">
                             Frame #{img.number}
                           </span>
@@ -203,13 +205,14 @@ export default function PhotosSection() {
                       <div
                         key={img.id}
                         onClick={() => handleOpenLightbox(globalIdx)}
-                        className="group bg-paper-light p-4 border border-paper-border hover:border-ink/70 rounded-xs shadow-xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                        className="group bg-paper-light p-4 border border-paper-border hover:border-ink/70 rounded-xs shadow-xs hover:shadow-sm transition-all duration-300 cursor-pointer flex flex-col"
                       >
-                        <div className="relative aspect-4/5 w-full overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
+                        <div className="relative w-full aspect-[4/5] overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
                           <img
                             src={img.src}
                             alt={img.alt}
-                            className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                            style={{ objectPosition: img.objectPosition || 'center top' }}
+                            className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-103 transition-transform duration-500"
                             loading="lazy"
                           />
                           <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -219,7 +222,7 @@ export default function PhotosSection() {
                           </div>
                         </div>
 
-                        <div className="mt-3.5 pt-3 border-t border-paper-border/70 flex items-center justify-between text-xs font-mono">
+                        <div className="mt-3.5 pt-2.5 border-t border-paper-border/70 flex items-center justify-between text-xs font-mono">
                           <span className="text-ink font-medium">{img.caption}</span>
                           <span className="text-olive font-bold tracking-wider">FRAME #{img.number}</span>
                         </div>

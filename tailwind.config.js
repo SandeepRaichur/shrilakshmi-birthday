@@ -44,6 +44,8 @@ export default {
         heading: ['Syne', 'sans-serif'],
         editorial: ['"Instrument Serif"', 'Georgia', 'serif'],
         mono: ['"Space Grotesk"', 'monospace'],
+        handwriting: ['"Caveat"', 'cursive'],
+        book: ['Newsreader', '"Instrument Serif"', 'Georgia', 'serif'],
       },
       boxShadow: {
         'soft': '0 10px 30px -5px rgba(216, 180, 254, 0.18), 0 4px 10px -2px rgba(251, 207, 232, 0.12)',

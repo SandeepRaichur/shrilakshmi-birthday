@@ -19,8 +19,8 @@ export default function LandingHero({ onEnter, onScrollToIndex }) {
   };
 
   return (
-    <section className="relative min-h-[85vh] sm:min-h-screen w-full flex flex-col justify-between px-6 sm:px-12 lg:px-20 py-8 sm:py-12 select-none border-b border-paper-border bg-paper">
-
+    <section className="relative min-h-[90vh] sm:min-h-screen w-full flex flex-col justify-between px-6 sm:px-12 lg:px-16 xl:px-20 py-8 sm:py-12 select-none border-b border-paper-border bg-paper">
+      
       {/* -----------------------------------------------------------------------
           TOP MASTHEAD
           ----------------------------------------------------------------------- */}
@@ -40,13 +40,13 @@ export default function LandingHero({ onEnter, onScrollToIndex }) {
       </header>
 
       {/* -----------------------------------------------------------------------
-          MAIN HERO: 2-COLUMN LAYOUT (TEXT ON LEFT, 1.JPEG ON RIGHT)
+          MAIN HERO: BALANCED 2-COLUMN LAYOUT (PERFECTLY ALIGNED & PROPORTIONED)
           ----------------------------------------------------------------------- */}
-      <div className="w-full max-w-6xl mx-auto my-auto py-8 sm:py-14 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-
+      <div className="w-full max-w-6xl mx-auto my-auto py-10 sm:py-14 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+        
         {/* Left Column: Greeting & Simple English Text */}
-        <div className="lg:col-span-7 space-y-6 text-left">
-
+        <div className="lg:col-span-7 flex flex-col justify-center space-y-6 text-left">
+          
           {/* Friendly Kannada greeting */}
           {introduction.salutation && (
             <p className="text-xs sm:text-sm font-mono text-olive font-semibold tracking-wider">
@@ -54,8 +54,8 @@ export default function LandingHero({ onEnter, onScrollToIndex }) {
             </p>
           )}
 
-          {/* Bold headline */}
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-ink leading-[0.9] tracking-tighter">
+          {/* Bold, architectural headline */}
+          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] font-display font-bold text-ink leading-[0.9] tracking-tighter">
             <span className="block">{introduction.headlineLine1 || "hey,"}</span>
             <span className="block text-ink/90 font-display font-bold lowercase">
               {profile?.name ? `${profile.name.toLowerCase()}.` : (introduction.headlineLine2 || "shrilakshmi.")}
@@ -63,7 +63,7 @@ export default function LandingHero({ onEnter, onScrollToIndex }) {
           </h1>
 
           {/* Simple English text */}
-          <div className="space-y-2 max-w-lg">
+          <div className="space-y-2.5 max-w-lg">
             <p className="text-lg sm:text-2xl font-sans font-medium text-ink leading-snug">
               {introduction.tagline || "No big reason for this website, just made it for fun."}
             </p>
@@ -77,7 +77,7 @@ export default function LandingHero({ onEnter, onScrollToIndex }) {
           <div className="pt-2">
             <button
               onClick={handleCueClick}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-ink text-paper text-xs font-mono font-semibold tracking-wider uppercase rounded-xs hover:bg-olive transition-all cursor-pointer shadow-2xs active:scale-98"
+              className="inline-flex items-center gap-2.5 px-6 py-3 bg-ink text-paper text-xs font-mono font-semibold tracking-wider uppercase rounded-xs hover:bg-olive transition-all cursor-pointer shadow-xs active:scale-98"
             >
               <span>{introduction.scrollCue || "SEE OUR STORY ↓"}</span>
             </button>
@@ -85,29 +85,30 @@ export default function LandingHero({ onEnter, onScrollToIndex }) {
 
         </div>
 
-        {/* Right Column: 1.jpeg photo (Exactly where user drew the orange arrow!) */}
-        <div className="lg:col-span-5 flex flex-col items-center justify-center">
-          <div className="w-full max-w-sm bg-paper-light p-3 sm:p-4 border border-paper-border rounded-xs shadow-xs hover:border-ink/60 transition-all duration-300">
-
-            {/* Top Tape Sticker */}
-            <div className="flex items-center justify-between text-[11px] font-mono text-muted-text pb-2.5 mb-2 border-b border-paper-border">
-              <span className="font-semibold text-ink">MOMENT #01</span>
-              <span className="text-olive font-bold">FAVOURITE MEME</span>
+        {/* Right Column: Properly Sized, Symmetrical Photo Card (2.jpeg) */}
+        <div className="lg:col-span-5 flex items-center justify-center lg:justify-end w-full">
+          <div className="w-full max-w-md sm:max-w-lg lg:max-w-[430px] xl:max-w-[460px] bg-paper-light p-3.5 sm:p-5 border border-paper-border rounded-xs shadow-sm hover:shadow-md hover:border-ink/50 transition-all duration-300">
+            
+            {/* Top Header Strip */}
+            <div className="flex items-center justify-between text-xs font-mono text-muted-text pb-3 mb-3 border-b border-paper-border">
+              <span className="font-semibold text-ink tracking-wide">MOMENT #01</span>
+              <span className="text-olive font-bold text-[11px] tracking-wider uppercase">TULIPS & BOW 🌷</span>
             </div>
 
-            {/* Photo 1.jpeg container */}
-            <div className="relative aspect-4/3 w-full overflow-hidden bg-paper-dark border border-paper-border rounded-xs">
+            {/* Photo 2.jpeg: Square 1:1 Aspect Ratio matching the 736x736 image */}
+            <div className="relative aspect-square w-full overflow-hidden bg-paper-dark border border-paper-border/80 rounded-xs">
               <img
                 src="/photos/2.jpeg"
-                alt="Shrilakshmi moment 1"
+                alt="Shrilakshmi moment"
                 className="w-full h-full object-cover object-center"
               />
             </div>
 
-            {/* Simple caption */}
-            <p className="text-xs font-mono text-muted-text mt-3 text-center">
-              "Chef's kiss reaction 😂"
-            </p>
+            {/* Simple, cute caption */}
+            <div className="mt-3.5 pt-2.5 border-t border-paper-border/70 flex items-center justify-between text-xs font-mono text-muted-text">
+              <span className="truncate pr-2">"A little cute moment for you"</span>
+              <span className="text-ink font-semibold shrink-0">✨ 🌷</span>
+            </div>
 
           </div>
         </div>
